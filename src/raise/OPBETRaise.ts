@@ -107,6 +107,15 @@ class MerkleRootSetEvent extends NetEvent {
  * No token is minted yet — this is a pure registry.
  * At TGE the deployer snapshots all balances and distributes via the real token.
  *
+ * Allocation pools (intentionally separate, no shared cap):
+ *   - Presale : up to 10,000,000 OPBET (10% of 100M supply) via BTC purchases
+ *   - Airdrop : up to  5,000,000 OPBET ( 5% of 100M supply) via MOTO Merkle claims
+ *                     (1,000 slots × 5,000 OPBET each)
+ *   - Combined: up to 15,000,000 OPBET (15% of 100M supply) — tracked in separate maps
+ *
+ * The TGE distribution script must sum _raiseBalance and _airdropBalance per address
+ * and respect the 10M / 5M per-pool caps when minting.
+ *
  * Deployment calldata (in order):
  *   1. treasuryKey     : u256  — 32-byte x-only P2TR pubkey of BTC treasury
  *   2. initSatsPerToken: u256  — sats per 1 whole OPBET; 0 = BTC purchases disabled

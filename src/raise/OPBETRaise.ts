@@ -11,7 +11,6 @@ import {
     Revert,
     SafeMath,
     Segwit,
-    StoredAddress,
     StoredBoolean,
     StoredU256,
     keccak256,
@@ -197,13 +196,14 @@ export class OPBETRaise extends OP_NET {
         );
         if (u256.eq(opbetOwed, u256.Zero)) throw new Revert('Payment too small for 1 token unit');
 
-        // Clamp to remaining presale capacity
+        // Guard presale capacity — revert (not clamp) because BTC is already paid to treasury
         const currentSold: u256 = this._presaleSold.value;
         const remaining: u256 = u256.gt(PRESALE_CAP, currentSold)
             ? SafeMath.sub(PRESALE_CAP, currentSold)
             : u256.Zero;
         if (u256.eq(remaining, u256.Zero)) throw new Revert('Presale cap reached');
-        const actualOwed: u256 = u256.lt(opbetOwed, remaining) ? opbetOwed : remaining;
+        if (u256.gt(opbetOwed, remaining)) throw new Revert('Payment exceeds remaining presale cap');
+        const actualOwed: u256 = opbetOwed;
 
         // Record in registry
         const prev: u256 = this._raiseBalance.get(recipient);
@@ -236,7 +236,10 @@ export class OPBETRaise extends OP_NET {
     @returns({ name: 'success', type: ABIDataTypes.BOOL })
     public setMerkleRoot(calldata: Calldata): BytesWriter {
         this.onlyDeployer(Blockchain.tx.sender);
+        // Root is immutable once set — prevents eligibility set manipulation after claims begin
+        if (!u256.eq(this._merkleRoot.value, u256.Zero)) throw new Revert('Merkle root already set');
         const root: u256 = calldata.readU256();
+        if (u256.eq(root, u256.Zero)) throw new Revert('Invalid root');
         this._merkleRoot.value = root;
         this.emitEvent(new MerkleRootSetEvent(root));
         const writer = new BytesWriter(1);
@@ -263,6 +266,8 @@ export class OPBETRaise extends OP_NET {
     public claimAirdrop(calldata: Calldata): BytesWriter {
         const recipient: Address = calldata.readAddress();
         if (recipient.equals(Address.zero())) throw new Revert('Invalid recipient');
+        // Prevent griefing: only the recipient can register their own claim
+        if (!Blockchain.tx.sender.equals(recipient)) throw new Revert('Sender must be recipient');
 
         const root: u256 = this._merkleRoot.value;
         if (u256.eq(root, u256.Zero)) throw new Revert('Airdrop not configured');

@@ -203,23 +203,22 @@ export class OPBETRaise extends OP_NET {
             : u256.Zero;
         if (u256.eq(remaining, u256.Zero)) throw new Revert('Presale cap reached');
         if (u256.gt(opbetOwed, remaining)) throw new Revert('Payment exceeds remaining presale cap');
-        const actualOwed: u256 = opbetOwed;
 
         // Record in registry
         const prev: u256 = this._raiseBalance.get(recipient);
-        this._raiseBalance.set(recipient, SafeMath.add(prev, actualOwed));
+        this._raiseBalance.set(recipient, SafeMath.add(prev, opbetOwed));
 
-        const newSold: u256 = SafeMath.add(currentSold, actualOwed);
+        const newSold: u256 = SafeMath.add(currentSold, opbetOwed);
         this._presaleSold.value = newSold;
 
-        this.emitEvent(new RaisePurchaseEvent(recipient, u256.fromU64(satsPaid), actualOwed));
+        this.emitEvent(new RaisePurchaseEvent(recipient, u256.fromU64(satsPaid), opbetOwed));
 
         if (u256.ge(newSold, PRESALE_CAP)) {
             this._presaleActive.value = false;
         }
 
         const writer = new BytesWriter(32);
-        writer.writeU256(actualOwed);
+        writer.writeU256(opbetOwed);
         return writer;
     }
 
@@ -339,6 +338,13 @@ export class OPBETRaise extends OP_NET {
      *   sold(u256) | remaining(u256) | cap(u256) | satsPerToken(u256) | active(bool)
      */
     @method()
+    @returns(
+        { name: 'sold',         type: ABIDataTypes.UINT256 },
+        { name: 'remaining',    type: ABIDataTypes.UINT256 },
+        { name: 'cap',          type: ABIDataTypes.UINT256 },
+        { name: 'satsPerToken', type: ABIDataTypes.UINT256 },
+        { name: 'active',       type: ABIDataTypes.BOOL    },
+    )
     public presaleInfo(_calldata: Calldata): BytesWriter {
         const sold: u256 = this._presaleSold.value;
         const remaining: u256 = u256.gt(PRESALE_CAP, sold)
@@ -356,6 +362,13 @@ export class OPBETRaise extends OP_NET {
 
     /** Airdrop status: root | claimCount | maxClaims | amountPerClaim | active */
     @method()
+    @returns(
+        { name: 'root',           type: ABIDataTypes.UINT256 },
+        { name: 'claimCount',     type: ABIDataTypes.UINT256 },
+        { name: 'maxClaims',      type: ABIDataTypes.UINT256 },
+        { name: 'amountPerClaim', type: ABIDataTypes.UINT256 },
+        { name: 'active',         type: ABIDataTypes.BOOL    },
+    )
     public airdropInfo(_calldata: Calldata): BytesWriter {
         const count: u256 = this._airdropCount.value;
         const writer = new BytesWriter(32 + 32 + 32 + 32 + 1);
@@ -373,6 +386,11 @@ export class OPBETRaise extends OP_NET {
      * @returns raiseOwed(u256) | airdropOwed(u256) | total(u256)
      */
     @method({ name: 'addr', type: ABIDataTypes.ADDRESS })
+    @returns(
+        { name: 'raiseOwed',   type: ABIDataTypes.UINT256 },
+        { name: 'airdropOwed', type: ABIDataTypes.UINT256 },
+        { name: 'total',       type: ABIDataTypes.UINT256 },
+    )
     public getBalance(calldata: Calldata): BytesWriter {
         const addr: Address = calldata.readAddress();
         const raiseOwed: u256    = this._raiseBalance.get(addr);

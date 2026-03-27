@@ -9,6 +9,7 @@
     "build": "npm run build:token && npm run build:market && npm run build:raise",
     "test:raise": "node --import ./node_modules/tsx/dist/esm/index.mjs test/opbet-raise.test.mts",
     "test:raise:ts": "node --import ./node_modules/tsx/dist/esm/index.mjs test/opbet-raise.test.ts",
+    "test:token": "node --import ./node_modules/tsx/dist/esm/index.mjs test/opbet-token.test.mts",
     "clean": "rm -rf build/*",
     "postinstall": "node scripts/patch-noble-hashes.js"
   },

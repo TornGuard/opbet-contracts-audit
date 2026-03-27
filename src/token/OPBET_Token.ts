@@ -53,6 +53,11 @@ const AIRDROP_AMOUNT: u256 = u256.fromString('5000000000000000000000');
 /** Airdrop: first 1,000 MOTO holders to claim */
 const AIRDROP_MAX_CLAIMS: u256 = u256.fromU32(1000);
 
+/** 5,000,000 OPBET (5% of supply) reserved for airdrop — devMint cannot touch this. */
+const AIRDROP_SUPPLY: u256 = u256.fromString('5000000000000000000000000');
+/** devMint hard cap: 100M − 10M presale − 5M airdrop = 85M OPBET */
+const DEV_MINT_CAP: u256 = u256.fromString('85000000000000000000000000');
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Events
 // ─────────────────────────────────────────────────────────────────────────────
@@ -187,6 +192,10 @@ export class OPBET_Token extends OP20 {
     /** Single OPNet address that receives proceeds for all supported OP20 tokens */
     private readonly _tokensTreasury: StoredAddress  = new StoredAddress(this.tokensTreasuryPointer);
 
+    // ── DevMint tracker (guards against eating into airdrop reserve) ──────
+    private readonly devMintedPointer: u16         = Blockchain.nextPointer;
+    private readonly _devMinted: StoredU256        = new StoredU256(this.devMintedPointer, EMPTY_POINTER);
+
     // ── Airdrop / Merkle storage ───────────────────────────────────────────
     private readonly merkleRootPointer: u16        = Blockchain.nextPointer;
     private readonly airdropClaimedPointer: u16    = Blockchain.nextPointer;
@@ -231,6 +240,9 @@ export class OPBET_Token extends OP20 {
 
         const initSatsPerToken: u256 = calldata.readU256();
         this._satsPerToken.value = initSatsPerToken;
+
+        // Explicitly write presale active — StoredBoolean default not reliable in all runtimes
+        this._presaleActive.value = true;
 
         // Deployer and team wallet are always tax-exempt
         this._taxExempt.set(Blockchain.tx.sender, U256_ONE);
@@ -278,10 +290,10 @@ export class OPBET_Token extends OP20 {
         );
         if (u256.eq(tokensMinted, u256.Zero)) throw new Revert('Payment too small for 1 token unit');
 
-        this._mintPresale(recipient, Address.zero(), u256.fromU64(satsPaid), tokensMinted);
+        const actualMinted: u256 = this._mintPresale(recipient, Address.zero(), u256.fromU64(satsPaid), tokensMinted);
 
         const writer = new BytesWriter(32);
-        writer.writeU256(tokensMinted);
+        writer.writeU256(actualMinted);
         return writer;
     }
 
@@ -321,10 +333,10 @@ export class OPBET_Token extends OP20 {
         // Pull payment tokens from buyer to the shared OP20 treasury
         this._pullToken(token, Blockchain.tx.sender, this._tokensTreasury.value, tokenAmount);
 
-        this._mintPresale(Blockchain.tx.sender, token, tokenAmount, opbetMinted);
+        const actualMinted: u256 = this._mintPresale(Blockchain.tx.sender, token, tokenAmount, opbetMinted);
 
         const writer = new BytesWriter(32);
-        writer.writeU256(opbetMinted);
+        writer.writeU256(actualMinted);
         return writer;
     }
 
@@ -449,6 +461,10 @@ export class OPBET_Token extends OP20 {
         if (to.equals(Address.zero())) throw new Revert('Cannot mint to zero address');
         const amount: u256 = calldata.readU256();
         if (u256.eq(amount, u256.Zero)) throw new Revert('Amount cannot be zero');
+
+        const newDevMinted: u256 = SafeMath.add(this._devMinted.value, amount);
+        if (u256.gt(newDevMinted, DEV_MINT_CAP)) throw new Revert('Exceeds dev mint allocation (85M cap, 5M reserved for airdrop)');
+        this._devMinted.value = newDevMinted;
 
         this._mint(to, amount);
         this.emitEvent(new DevMintEvent(to, amount));
@@ -655,18 +671,27 @@ export class OPBET_Token extends OP20 {
         paymentToken: Address,
         amountPaid: u256,
         opbetMinted: u256,
-    ): void {
-        const newSold: u256 = SafeMath.add(this._presaleSold.value, opbetMinted);
-        if (u256.gt(newSold, PRESALE_CAP)) throw new Revert('Purchase exceeds presale cap');
+    ): u256 {
+        const currentSold: u256 = this._presaleSold.value;
+        const remaining: u256 = u256.gt(PRESALE_CAP, currentSold)
+            ? SafeMath.sub(PRESALE_CAP, currentSold)
+            : u256.Zero;
+        if (u256.eq(remaining, u256.Zero)) throw new Revert('Presale cap reached');
+
+        // Clamp to remaining capacity — partial fill at boundary rather than revert
+        const actualMinted: u256 = u256.lt(opbetMinted, remaining) ? opbetMinted : remaining;
+        const newSold: u256 = SafeMath.add(currentSold, actualMinted);
 
         this._presaleSold.value = newSold;
-        this._mint(buyer, opbetMinted);
-        this.emitEvent(new PresalePurchaseEvent(buyer, paymentToken, amountPaid, opbetMinted));
+        this._mint(buyer, actualMinted);
+        this.emitEvent(new PresalePurchaseEvent(buyer, paymentToken, amountPaid, actualMinted));
 
-        if (u256.eq(newSold, PRESALE_CAP)) {
+        if (u256.ge(newSold, PRESALE_CAP)) {
             this._presaleActive.value = false;
             this.emitEvent(new PresaleCompleteEvent(newSold));
         }
+
+        return actualMinted;
     }
 
     private _requirePresaleActive(): void {
@@ -682,6 +707,7 @@ export class OPBET_Token extends OP20 {
     private _findBTCPaymentToTreasury(): u64 {
         const treasuryKey: u256 = this._treasuryKey.value;
         const outputs = Blockchain.tx.outputs;
+        let total: u64 = 0;
 
         for (let i = 0; i < outputs.length; i++) {
             const output = outputs[i];
@@ -690,7 +716,8 @@ export class OPBET_Token extends OP20 {
             const script = output.scriptPublicKey;
             if (script !== null && script.length === 34 && script[0] === 0x51 && script[1] === 0x20) {
                 if (this._keyBytesMatch(script, 2, treasuryKey)) {
-                    return output.value;
+                    total += output.value;
+                    continue;
                 }
             }
 
@@ -700,12 +727,12 @@ export class OPBET_Token extends OP20 {
                 const dec = Segwit.decodeOrNull(to);
                 if (dec !== null && dec.version === 1 && dec.program.length === 32) {
                     if (this._keyBytesMatch(dec.program, 0, treasuryKey)) {
-                        return output.value;
+                        total += output.value;
                     }
                 }
             }
         }
-        return 0;
+        return total;
     }
 
     /**

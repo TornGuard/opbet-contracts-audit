@@ -5,7 +5,10 @@
   "scripts": {
     "build:token": "asc src/token/index.ts --config asconfig.token.json --target debug",
     "build:market": "asc src/market/index.ts --config asconfig.market.json --target debug",
-    "build": "npm run build:token && npm run build:market",
+    "build:raise": "asc src/raise/index.ts --config asconfig.raise.json --target debug",
+    "build": "npm run build:token && npm run build:market && npm run build:raise",
+    "test:raise": "node --import ./node_modules/tsx/dist/esm/index.mjs test/opbet-raise.test.mts",
+    "test:raise:ts": "node --import ./node_modules/tsx/dist/esm/index.mjs test/opbet-raise.test.ts",
     "clean": "rm -rf build/*",
     "postinstall": "node scripts/patch-noble-hashes.js"
   },

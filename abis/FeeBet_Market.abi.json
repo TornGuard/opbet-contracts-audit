@@ -1,0 +1,415 @@
+{
+    "functions": [
+        {
+            "name": "placeBet",
+            "type": "Function",
+            "payable": false,
+            "onlyOwner": false,
+            "inputs": [
+                {
+                    "name": "token",
+                    "type": "ADDRESS"
+                },
+                {
+                    "name": "betType",
+                    "type": "UINT256"
+                },
+                {
+                    "name": "param1",
+                    "type": "UINT256"
+                },
+                {
+                    "name": "param2",
+                    "type": "UINT256"
+                },
+                {
+                    "name": "amount",
+                    "type": "UINT256"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "betId",
+                    "type": "UINT256"
+                }
+            ]
+        },
+        {
+            "name": "resolveBet",
+            "type": "Function",
+            "payable": false,
+            "onlyOwner": false,
+            "inputs": [
+                {
+                    "name": "betId",
+                    "type": "UINT256"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "won",
+                    "type": "BOOL"
+                },
+                {
+                    "name": "payout",
+                    "type": "UINT256"
+                }
+            ]
+        },
+        {
+            "name": "refundBet",
+            "type": "Function",
+            "payable": false,
+            "onlyOwner": false,
+            "inputs": [
+                {
+                    "name": "betId",
+                    "type": "UINT256"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "refundAmount",
+                    "type": "UINT256"
+                }
+            ]
+        },
+        {
+            "name": "setBlockData",
+            "type": "Function",
+            "payable": false,
+            "onlyOwner": false,
+            "inputs": [
+                {
+                    "name": "blockHeight",
+                    "type": "UINT256"
+                },
+                {
+                    "name": "medianFee",
+                    "type": "UINT256"
+                },
+                {
+                    "name": "mempoolCount",
+                    "type": "UINT256"
+                },
+                {
+                    "name": "blockTimestamp",
+                    "type": "UINT256"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "success",
+                    "type": "BOOL"
+                }
+            ]
+        },
+        {
+            "name": "seedPool",
+            "type": "Function",
+            "payable": false,
+            "onlyOwner": false,
+            "inputs": [
+                {
+                    "name": "token",
+                    "type": "ADDRESS"
+                },
+                {
+                    "name": "amount",
+                    "type": "UINT256"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "success",
+                    "type": "BOOL"
+                }
+            ]
+        },
+        {
+            "name": "drainPool",
+            "type": "Function",
+            "payable": false,
+            "onlyOwner": false,
+            "inputs": [
+                {
+                    "name": "token",
+                    "type": "ADDRESS"
+                },
+                {
+                    "name": "amount",
+                    "type": "UINT256"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "success",
+                    "type": "BOOL"
+                }
+            ]
+        },
+        {
+            "name": "addAcceptedToken",
+            "type": "Function",
+            "payable": false,
+            "onlyOwner": false,
+            "inputs": [
+                {
+                    "name": "token",
+                    "type": "ADDRESS"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "success",
+                    "type": "BOOL"
+                }
+            ]
+        },
+        {
+            "name": "removeAcceptedToken",
+            "type": "Function",
+            "payable": false,
+            "onlyOwner": false,
+            "inputs": [
+                {
+                    "name": "token",
+                    "type": "ADDRESS"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "success",
+                    "type": "BOOL"
+                }
+            ]
+        },
+        {
+            "name": "getBetInfo",
+            "type": "Function",
+            "payable": false,
+            "onlyOwner": false,
+            "inputs": [
+                {
+                    "name": "betId",
+                    "type": "UINT256"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "betType",
+                    "type": "UINT256"
+                },
+                {
+                    "name": "param1",
+                    "type": "UINT256"
+                },
+                {
+                    "name": "param2",
+                    "type": "UINT256"
+                },
+                {
+                    "name": "amount",
+                    "type": "UINT256"
+                },
+                {
+                    "name": "odds",
+                    "type": "UINT256"
+                },
+                {
+                    "name": "targetBlock",
+                    "type": "UINT256"
+                },
+                {
+                    "name": "endBlock",
+                    "type": "UINT256"
+                },
+                {
+                    "name": "status",
+                    "type": "UINT256"
+                },
+                {
+                    "name": "payout",
+                    "type": "UINT256"
+                },
+                {
+                    "name": "token",
+                    "type": "UINT256"
+                }
+            ]
+        },
+        {
+            "name": "getBlockData",
+            "type": "Function",
+            "payable": false,
+            "onlyOwner": false,
+            "inputs": [
+                {
+                    "name": "blockHeight",
+                    "type": "UINT256"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "medianFee",
+                    "type": "UINT256"
+                },
+                {
+                    "name": "mempoolCount",
+                    "type": "UINT256"
+                },
+                {
+                    "name": "blockTimestamp",
+                    "type": "UINT256"
+                },
+                {
+                    "name": "dataSet",
+                    "type": "UINT256"
+                }
+            ]
+        },
+        {
+            "name": "getNextBetId",
+            "type": "Function",
+            "payable": false,
+            "onlyOwner": false,
+            "inputs": [],
+            "outputs": [
+                {
+                    "name": "nextBetId",
+                    "type": "UINT256"
+                }
+            ]
+        },
+        {
+            "name": "getCurrentBtcBlock",
+            "type": "Function",
+            "payable": false,
+            "onlyOwner": false,
+            "inputs": [],
+            "outputs": [
+                {
+                    "name": "currentBtcBlock",
+                    "type": "UINT256"
+                }
+            ]
+        },
+        {
+            "name": "getBetOwner",
+            "type": "Function",
+            "payable": false,
+            "onlyOwner": false,
+            "inputs": [
+                {
+                    "name": "betId",
+                    "type": "UINT256"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "owner",
+                    "type": "UINT256"
+                }
+            ]
+        },
+        {
+            "name": "getPoolInfo",
+            "type": "Function",
+            "payable": false,
+            "onlyOwner": false,
+            "inputs": [
+                {
+                    "name": "token",
+                    "type": "ADDRESS"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "totalPool",
+                    "type": "UINT256"
+                },
+                {
+                    "name": "pendingExposure",
+                    "type": "UINT256"
+                },
+                {
+                    "name": "latestOracleFee",
+                    "type": "UINT256"
+                }
+            ]
+        },
+        {
+            "name": "isTokenAccepted",
+            "type": "Function",
+            "payable": false,
+            "onlyOwner": false,
+            "inputs": [
+                {
+                    "name": "token",
+                    "type": "ADDRESS"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "accepted",
+                    "type": "BOOL"
+                }
+            ]
+        },
+        {
+            "name": "setMinBet",
+            "type": "Function",
+            "payable": false,
+            "onlyOwner": false,
+            "inputs": [
+                {
+                    "name": "amount",
+                    "type": "UINT256"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "success",
+                    "type": "BOOL"
+                }
+            ]
+        },
+        {
+            "name": "setMaxBet",
+            "type": "Function",
+            "payable": false,
+            "onlyOwner": false,
+            "inputs": [
+                {
+                    "name": "amount",
+                    "type": "UINT256"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "success",
+                    "type": "BOOL"
+                }
+            ]
+        },
+        {
+            "name": "setPaused",
+            "type": "Function",
+            "payable": false,
+            "onlyOwner": false,
+            "inputs": [
+                {
+                    "name": "paused",
+                    "type": "BOOL"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "success",
+                    "type": "BOOL"
+                }
+            ]
+        }
+    ],
+    "events": []
+}

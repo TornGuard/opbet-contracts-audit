@@ -1,0 +1,4 @@
+{
+  "extends": "@btc-vision/assemblyscript/std/assembly.json",
+  "include": ["src/**/*.ts"]
+}

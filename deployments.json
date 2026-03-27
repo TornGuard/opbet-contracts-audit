@@ -1,0 +1,94 @@
+{
+  "network": "opnetTestnet",
+  "rpcUrl": "https://testnet.opnet.org",
+  "deployer": "opt1p40m5e4v7ylgwlw28978hhy39ru7407038t5vd322stptvguws7vq2xua87",
+  "contracts": {
+    "OPBET_Token": {
+      "address": "opt1sqz7zu9777w66x3t5gqy8j6m62ege0af60yjlyrkm",
+      "deployedAt": "2026-03-15"
+    },
+    "FeeBet_Market_v4": {
+      "address": "opt1sqz2t0e5y6g6u4fcq9rgdejh6atpjvpcsfulmgv4z",
+      "fundingTx": "ff1765052e5e7b53c5fa6f3c8accc3e0af85b6ecac643f29b0ecce43dca3412b",
+      "revealTx": "040f223491330446a1cf0da3863c7191bfabc02921c9c583986e4a70fcc96811",
+      "deployedAt": "2026-03-16",
+      "version": 4,
+      "note": "v4: Operator-as-house, dynamic O/U odds, pool solvency, 4-state lifecycle, refund path"
+    },
+    "FeeBet_Market_v5_failed": {
+      "address": "opt1sqznen6tmkv2vmx554wnsdr569p8u9dmq0vwaa7fj",
+      "note": "v5 failed: env.abort import missing in WASM"
+    },
+    "FeeBet_Market_v6": {
+      "address": "opt1sqzzg50evypqmhr5jcy9nr2nf27je7phkwy4kjxxc",
+      "note": "v6: wrong cross-contract selectors (used Ethereum keccak, not OPNet)"
+    },
+    "FeeBet_Market_v7": {
+      "address": "opt1sqr9uawuvge5v0msrtxleew0q4clkfyufeusfdzeh",
+      "fundingTx": "ff8976e42caeb412a06548231e18f351458e775fa84f6fb0db0d565c21f45852",
+      "revealTx": "ac3167e45cecbb641a66437e774625c1b408976a925b6e980c7b76f3ca997b72",
+      "deployedAt": "2026-03-17",
+      "version": 7,
+      "note": "v7: Fixed OPNet selectors but u256→Address endianness bug (toUint8Array default LE vs fromUint8ArrayBE)"
+    },
+    "FeeBet_Market_v8": {
+      "address": "opt1sqqw7u4sd70qecvtrspwkj6gqld37xq2a2gv3qva5",
+      "fundingTx": "3da124de7b7b1b114c3c579f0d58797bdfbc71f9ee5a91872c1ebcc905044f84",
+      "revealTx": "1d380641b977dc18367040cc70dfac15718a507bc9cabbff61ded06927eedeb9",
+      "deployedAt": "2026-03-17",
+      "version": 8,
+      "note": "v8: Deployed with OLD wasm before endianness fix"
+    },
+    "FeeBet_Market_v9": {
+      "address": "opt1sqqrm9dvf353e9klcq3y8mggcvsqm4f4adgzv786c",
+      "fundingTx": "db11847065917dffd50c9d89db16c607bb75af95b035bd199b266fe5e3ba62cd",
+      "revealTx": "4c2a71826d3536d0ee51c489c171f78394b92c219ed448ee078e447c77dbdfe7",
+      "deployedAt": "2026-03-17",
+      "version": 9,
+      "note": "v9: Fixed u256→Address endianness (toUint8Array(true)), all 9 local tests pass"
+    },
+    "FeeBet_Market": {
+      "address": "opt1sqpcvv75pse88u6c5glz7mu6rqhm6wdf7qsmvnnqz",
+      "fundingTx": "36418c10d9e18e63f13c03d6dac33f3ed354615651b85db3e13a4acf48186e97",
+      "revealTx": "077f6f128e0b67448cc45c7afe7bd8784a25549adab05ea423bcf689dde4cb6e",
+      "deployedAt": "2026-03-22",
+      "version": 12,
+      "note": "v12: MAX_BLOCK_ADVANCE 100→10000 to survive keeper restarts and long gaps"
+    },
+    "FeeBet_Market_v10": {
+      "address": "opt1sqqucv3ewazm4y5yhy7uc5le706z76jtrpqkmpnqe",
+      "fundingTx": "f1c83049f6cebb86b4051e116376fbde358ec57fdb74133800eff6d395ae78cd",
+      "revealTx": "0a9531a983726e8b3a218f6fb58d01ec82ad979630b83c5b7fa6c63a99a72957",
+      "deployedAt": "2026-03-19",
+      "version": 10,
+      "note": "v10: Bitcoin block tracking (_currentBtcBlock), airdrop indexing, 3 security fixes (setBlockData max-height guard, reentrancy fix, trend requires all blocks)"
+    },
+    "FeeBet_Market_v11": {
+      "address": "opt1sqqht90a38syqu7l7rcaf2ttveulsn9l57q3kyng7",
+      "fundingTx": "e6e3fbd35f9ae7d1f3f610934622f4ae7207da34f9d6a02ce04f7b767fe240ae",
+      "revealTx": "5a6553aff634c358255ab836e28be4a31dce8890cb769d2a8cedf063859badc3",
+      "deployedAt": "2026-03-19",
+      "version": 11,
+      "note": "v11: Oracle uses Bitcoin signet block heights (MAX_BLOCK_ADVANCE=100), fresh _currentBtcBlock seeded by signet tip"
+    },
+    "OPBET_Token_Presale": {
+      "address": "opt1sqpkn4l57qf5smt7xgtmduh62cfc8jdq0syl4cfke",
+      "fundingTx": "7a806374c9b6e486a93656c54ce3f7a18252d9bf5c2f1503d08c064d36658d76",
+      "revealTx": "c1dea8bec12b8996b41811a70a2f9221a0b1774e5406b4f088b2dd9b456e454b",
+      "deployedAt": "2026-03-23",
+      "btcTreasury": "bc1ptexjwyn83gl0e5j5jlf89f4gtcfn4cqrrjlw8jrkkxtzjwcl8drq09k6h4",
+      "satsPerToken": "1",
+      "note": "Presale token: BTC + multi-token, 10% cap, dev mint, 3% tax"
+    },
+    "OPBET_Token_Presale_Testnet": {
+      "address": "opt1sqqea9yt9l05th6rftt77edyk93j2zewgrct4fpfc",
+      "network": "testnet",
+      "fundingTx": "13f8086278dc482f8703a480c320c709eef7fc1bda482a3250a7ee2708e2c079",
+      "revealTx": "e59f28a49a9f4c1b44dbc1df4c5ef9f476188c5f69452f1d4f78c6d31c11ed7a",
+      "deployedAt": "2026-03-24",
+      "btcTreasury": "deployer-key (testnet)",
+      "satsPerToken": "14",
+      "note": "Presale token: BTC + multi-token, 10% cap, dev mint, 3% tax, Merkle airdrop"
+    }
+  }
+}

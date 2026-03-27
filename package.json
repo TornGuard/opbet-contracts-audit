@@ -1,0 +1,27 @@
+{
+  "name": "opbet-contracts",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build:token": "asc src/token/index.ts --config asconfig.token.json --target debug",
+    "build:market": "asc src/market/index.ts --config asconfig.market.json --target debug",
+    "build": "npm run build:token && npm run build:market",
+    "clean": "rm -rf build/*",
+    "postinstall": "node scripts/patch-noble-hashes.js"
+  },
+  "dependencies": {
+    "@btc-vision/as-bignum": "0.1.2",
+    "@btc-vision/btc-runtime": "rc"
+  },
+  "devDependencies": {
+    "@btc-vision/assemblyscript": "^0.29.2",
+    "@btc-vision/op-vm": "^1.0.0-rc.2",
+    "@btc-vision/opnet-transform": "1.1.0",
+    "@btc-vision/unit-test-framework": "^1.0.0-beta.0",
+    "dotenv": "^17.3.1",
+    "tsx": "^4.21.0"
+  },
+  "overrides": {
+    "@noble/hashes": "2.0.1"
+  }
+}

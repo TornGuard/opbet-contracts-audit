@@ -1,0 +1,212 @@
+{
+    "functions": [
+        {
+            "name": "addFeeder",
+            "type": "Function",
+            "payable": false,
+            "onlyOwner": false,
+            "inputs": [
+                {
+                    "name": "feeder",
+                    "type": "ADDRESS"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "success",
+                    "type": "BOOL"
+                }
+            ]
+        },
+        {
+            "name": "removeFeeder",
+            "type": "Function",
+            "payable": false,
+            "onlyOwner": false,
+            "inputs": [
+                {
+                    "name": "feeder",
+                    "type": "ADDRESS"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "success",
+                    "type": "BOOL"
+                }
+            ]
+        },
+        {
+            "name": "setMinFeeders",
+            "type": "Function",
+            "payable": false,
+            "onlyOwner": false,
+            "inputs": [
+                {
+                    "name": "min",
+                    "type": "UINT256"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "success",
+                    "type": "BOOL"
+                }
+            ]
+        },
+        {
+            "name": "setRoundDuration",
+            "type": "Function",
+            "payable": false,
+            "onlyOwner": false,
+            "inputs": [
+                {
+                    "name": "blocks",
+                    "type": "UINT256"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "success",
+                    "type": "BOOL"
+                }
+            ]
+        },
+        {
+            "name": "submitPrice",
+            "type": "Function",
+            "payable": false,
+            "onlyOwner": false,
+            "inputs": [
+                {
+                    "name": "symbolId",
+                    "type": "UINT256"
+                },
+                {
+                    "name": "price",
+                    "type": "UINT256"
+                },
+                {
+                    "name": "confidence",
+                    "type": "UINT256"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "published",
+                    "type": "BOOL"
+                }
+            ]
+        },
+        {
+            "name": "finalizeRound",
+            "type": "Function",
+            "payable": false,
+            "onlyOwner": false,
+            "inputs": [
+                {
+                    "name": "symbolId",
+                    "type": "UINT256"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "published",
+                    "type": "BOOL"
+                }
+            ]
+        },
+        {
+            "name": "getPrice",
+            "type": "Function",
+            "payable": false,
+            "onlyOwner": false,
+            "inputs": [
+                {
+                    "name": "symbolId",
+                    "type": "UINT256"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "price",
+                    "type": "UINT256"
+                },
+                {
+                    "name": "updateBlock",
+                    "type": "UINT256"
+                },
+                {
+                    "name": "confidence",
+                    "type": "UINT256"
+                },
+                {
+                    "name": "roundId",
+                    "type": "UINT256"
+                },
+                {
+                    "name": "isFresh",
+                    "type": "BOOL"
+                }
+            ]
+        },
+        {
+            "name": "latestPrice",
+            "type": "Function",
+            "payable": false,
+            "onlyOwner": false,
+            "inputs": [
+                {
+                    "name": "symbolId",
+                    "type": "UINT256"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "price",
+                    "type": "UINT256"
+                }
+            ]
+        },
+        {
+            "name": "isFeeder",
+            "type": "Function",
+            "payable": false,
+            "onlyOwner": false,
+            "inputs": [
+                {
+                    "name": "feeder",
+                    "type": "ADDRESS"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "authorized",
+                    "type": "BOOL"
+                }
+            ]
+        },
+        {
+            "name": "getConfig",
+            "type": "Function",
+            "payable": false,
+            "onlyOwner": false,
+            "inputs": [],
+            "outputs": [
+                {
+                    "name": "minFeeders",
+                    "type": "UINT256"
+                },
+                {
+                    "name": "feederCount",
+                    "type": "UINT256"
+                },
+                {
+                    "name": "roundDuration",
+                    "type": "UINT256"
+                }
+            ]
+        }
+    ],
+    "events": []
+}

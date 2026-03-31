@@ -289,7 +289,7 @@ export class PriceOracle extends OP_NET {
             if (u256.gt(lhs, rhs)) throw new Revert('Price deviation exceeds 20%');
         }
 
-        const currentBlock: u256 = u256.fromU64(Blockchain.block.numberU64);
+        const currentBlock: u256 = u256.fromU64(Blockchain.block.number);
         const currentRound: u256 = this._roundId.get(symbolId);
         const roundDur:     u256 = this._roundDuration.value;
 
@@ -313,8 +313,11 @@ export class PriceOracle extends OP_NET {
         // ── Open new round if none active ─────────────────────────────────────
         const activeRound: u256 = this._roundId.get(symbolId);
         const isNewRound:  bool = u256.eq(activeRound, u256.Zero);
+        // Use _latestRoundId as the base for the next round ID so the counter
+        // is monotonically increasing even after a round is finalised (which
+        // resets _roundId to 0 but leaves _latestRoundId at the last value).
         const thisRound:   u256 = isNewRound
-            ? SafeMath.add(currentRound, u256.One)  // increment on new
+            ? SafeMath.add(this._latestRoundId.get(symbolId), u256.One)
             : activeRound;
 
         if (isNewRound) {
@@ -340,7 +343,7 @@ export class PriceOracle extends OP_NET {
         const threshold: u256 = this._minFeeders.value;
         let published:   bool = false;
 
-        if (u256.gte(newCount, threshold)) {
+        if (u256.ge(newCount, threshold)) {
             this._finalise(symbolId, thisRound);
             published = true;
         }
@@ -365,7 +368,7 @@ export class PriceOracle extends OP_NET {
 
         const openedAt:   u256 = this._roundOpenedAt.get(symbolId);
         const deadline:   u256 = SafeMath.add(openedAt, this._roundDuration.value);
-        const now:        u256 = u256.fromU64(Blockchain.block.numberU64);
+        const now:        u256 = u256.fromU64(Blockchain.block.number);
 
         if (!u256.gt(now, deadline)) throw new Revert('Round not yet stale');
 
@@ -409,10 +412,10 @@ export class PriceOracle extends OP_NET {
         const updateBlk:  u256 = this._latestUpdateBlock.get(symbolId);
         const confidence: u256 = this._latestConfidence.get(symbolId);
         const roundId:    u256 = this._latestRoundId.get(symbolId);
-        const now:        u256 = u256.fromU64(Blockchain.block.numberU64);
+        const now:        u256 = u256.fromU64(Blockchain.block.number);
         const freshWindow: u256 = SafeMath.mul(this._roundDuration.value, u256.fromU32(2));
         const isFresh:    bool = !u256.eq(updateBlk, u256.Zero) &&
-                                  u256.lte(SafeMath.sub(now, updateBlk), freshWindow);
+                                  u256.le(SafeMath.sub(now, updateBlk), freshWindow);
 
         const writer: BytesWriter = new BytesWriter(5 * 32 + 1);
         writer.writeU256(price);
@@ -467,7 +470,7 @@ export class PriceOracle extends OP_NET {
      * Bounded loop: MAX_FEEDERS iterations max.
      */
     private _finalise(symbolId: u256, roundId: u256): void {
-        const count: u32 = u256.toU32(this._roundCount.get(symbolId));
+        const count: u32 = this._roundCount.get(symbolId).lo1 as u32;
 
         // Collect submitted prices into a fixed array
         const prices: StaticArray<u256> = new StaticArray<u256>(MAX_FEEDERS as i32);
@@ -493,7 +496,7 @@ export class PriceOracle extends OP_NET {
         // Publish
         this._latestPrice.set(symbolId, medPrice);
         this._latestConfidence.set(symbolId, medConf);
-        this._latestUpdateBlock.set(symbolId, u256.fromU64(Blockchain.block.numberU64));
+        this._latestUpdateBlock.set(symbolId, u256.fromU64(Blockchain.block.number));
         this._latestRoundId.set(symbolId, roundId);
 
         // Close round
